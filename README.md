@@ -1,5 +1,13 @@
 # PREVIEW
 
+## Shadow and Target Spotlights.
+
+### Shadow spotLight :
+![alt text](https://github.com/tsnzzhr/Grafkom_Arsip/blob/main/shadow_spotLight_demo.PNG)
+
+### Target spotLight :
+![alt text](https://github.com/tsnzzhr/Grafkom_Arsip/blob/main/target_spotLight_demo.gif)
+
 ## Geometries, Materials and Lights.
 
 ### Geometries and Materials :
