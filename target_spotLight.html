@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Spotlight</title>
+    <script src="js/three.min.js"></script>
+    <style>
+          body{
+              margin:0;    
+          }  
+    </style>
+  </head>
+  <body></body>
+</html>
+
+<script>
+  // ========== Contoh spotLight ==============
+  let scene, camera, renderer, lighthelper;
+  let cone, ball, spotlight, spot; // set up the environment - // initiallize scene, camera, objects and renderer
+  let dxPerFrame = 1;
+
+  let createFloor = function(){
+        var properties = {
+            specular: 0xa9fcff,
+            color: 0x1b222c,
+            emissive: 0x1b222c,
+            shininess: 0
+        }
+        var floorGeometry = new THREE.PlaneGeometry(4, 4, 20, 20);
+        var floorMaterial = new THREE.MeshPhongMaterial(properties);
+        var floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+        floorMesh.receiveShadow = true;
+        floorMesh.rotation.x = -0.5 * Math.PI;
+        scene.add(floorMesh);
+  }
+
+  let createCone = function () {
+    var properties = {
+        specular: 0xa9fcff,//pale turqoise
+        color: "skyblue",
+        emissive: 0x006063,//mosque
+        shininess: 15
+    }
+    const geometry = new THREE.ConeGeometry( 0.5, 1, 32 );
+    const material = new THREE.MeshPhongMaterial(properties);
+    cone = new THREE.Mesh( geometry, material );
+    cone.name = 'cone';
+    cone.castShadow = true;
+
+    scene.add( cone );
+  };
+
+  let createBall = function () {
+    var properties = {
+        specular: 0xa9fcff,//pale turqoise
+        color: "skyblue",
+        emissive: 0x006063,//mosque
+        shininess: 15
+    }
+    const geometry2 = new THREE.SphereGeometry( 0.3, 100, 100 );
+    const material2 = new THREE.MeshPhongMaterial(properties);
+    ball = new THREE.Mesh( geometry2, material2 );
+    ball.name = 'ball';
+    ball.castShadow = true;
+
+    scene.add(ball);
+  };
+
+  let init = function () {
+    // 1. create the scene and light
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color('grey'); 
+
+    spotlight = new THREE.SpotLight( 'white' );
+
+    spotlight.castShadow = true;//aktifkan penggunaan shadow
+    spotlight.angle = 0.4;
+    spotlight.penumbra = 0;
+    spotlight.decay = 3;
+    spotlight.distance = 10;
+    
+    //-------- TARGET POSITION ----------
+    spotlight.position.set( 2, 1, 0 );
+    spotlight.target.position.set(0.5,1,3);
+    lighthelper = new THREE.SpotLightHelper(spotlight);
+    scene.add(lighthelper);
+    scene.add(spotlight);
+    scene.add(spotlight.target);
+    
+
+    // 2. create an locate the camera
+    scene.add(new THREE.GridHelper(4,12,"white","white"));
+    camera = new THREE.PerspectiveCamera(
+      30,
+      window.innerWidth / window.innerHeight,
+      1,
+      1500
+    );
+    camera.position.set(0,2,5);
+    camera.lookAt(scene.position);
+
+    // 3. create an locate the object on the scene
+    createFloor();
+    createCone(); 
+    createBall();
+    cone.position.x += 0.5;
+    cone.position.y += 1;
+    cone.position.z += 1;
+    ball.position.x -= 1;
+    ball.position.y += 0.5;
+    ball.position.z += 1.5;
+    
+    // 4. create the renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;//aktifkan map sebagai space untuk dapat mengatasi bayangan
+
+    document.body.appendChild(renderer.domElement);
+  };
+
+  init(); // main animation loop - calls 50-60 in a second.
+  
+  let mainLoop = function () {
+    //console.log("Hello");
+    requestAnimationFrame(mainLoop);
+
+    ball.position.x += dxPerFrame;
+    if(ball.position.x > 1.5) dxPerFrame = -0.02; // if we're too far right, move towards the left
+    if(ball.position.x < -1.5) dxPerFrame =  0.02; // if we're too far left, move towards the right again
+
+
+    renderer.render(scene, camera);
+    };
+
+  mainLoop();
+</script>

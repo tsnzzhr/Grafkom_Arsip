@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Spotlight</title>
+    <script src="js/three.min.js"></script>
+    <style>
+          body{
+              margin:0;    
+          }  
+    </style>
+  </head>
+  <body></body>
+</html>
+
+<script>
+  // ========== Contoh spotLight ==============
+  let scene, camera, renderer, lighthelper;
+  let cone, spotlight, ball; // set up the environment - // initiallize scene, camera, objects and renderer
+  
+  let createFloor = function(){
+    var properties = {
+        specular: 0xa9fcff,
+        color: 0x1b222c,
+        emissive: 0x1b222c,
+        shininess: 0
+    }
+    var floorGeometry = new THREE.PlaneGeometry(4, 4, 20, 20);
+    var floorMaterial = new THREE.MeshPhongMaterial(properties);
+    var floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+    floorMesh.receiveShadow = true;
+    floorMesh.rotation.x = -0.5 * Math.PI;
+    scene.add(floorMesh);
+  }
+
+  let createCone = function () {
+    var properties = {
+        specular: 0xa9fcff,
+        color: "skyblue",
+        emissive: 0x006063,
+        shininess: 20
+    }
+    const geometry = new THREE.ConeGeometry( 0.5, 1, 32 );
+    const material = new THREE.MeshPhongMaterial(properties);
+    cone = new THREE.Mesh( geometry, material );
+    cone.name = 'cone';
+    cone.castShadow = true;
+
+    scene.add( cone );
+  };
+
+  let createBall = function () {
+    var properties = {
+        specular: 0xa9fcff,//pale turqoise
+        color: "skyblue",
+        emissive: 0x006063,//mosque
+        shininess: 15
+    }
+    const geometry2 = new THREE.SphereGeometry( 0.3, 100, 100 );
+    const material2 = new THREE.MeshPhongMaterial(properties);
+    ball = new THREE.Mesh( geometry2, material2 );
+    ball.name = 'ball';
+    ball.castShadow = true;
+
+    scene.add(ball);
+  };
+
+  let init = function () {
+    // 1. create the scene and light
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color("black"); 
+
+    spotlight = new THREE.SpotLight( 'white' );
+
+    spotlight.castShadow = true;
+    spotlight.angle = 0.4;
+    spotlight.penumbra = 0;
+    spotlight.decay = 5;
+    spotlight.distance = 10;
+    spotlight.position.set( 0.5, 1.5, 0 );
+
+    spotlight.shadow.mapSize.height = 512; // default
+    spotlight.shadow.mapSize.width = 512; // default
+    //Higher values give better quality shadows at the cost of computation time. 
+    //Values must be powers of 2, up to the WebGLRenderer.capabilities.maxTextureSize for a given device, 
+    //although the width and height don't have to be the same (so, for example, (512, 1024) is valid). 
+    //The default is ( 512, 512 ).
+    spotlight.shadow.camera.near = 1; // semakin kecil nilainya bayangan semakin ke kiri.
+    spotlight.shadow.camera.far = 500; // default
+    spotlight.shadow.focus = 1; // bayangan lingkaran sempurna, semakin kecil semakin polygonal.
+
+    lighthelper = new THREE.SpotLightHelper(spotlight);
+    scene.add(spotlight);
+    scene.add(lighthelper);
+
+
+    // 2. create an locate the camera
+    scene.add(new THREE.GridHelper(4,12,"white","grey"));
+    camera = new THREE.PerspectiveCamera(
+      30,
+      window.innerWidth / window.innerHeight,
+      1,
+      1500
+    );
+    camera.position.set(0,2,5);
+    camera.lookAt(scene.position);
+
+    // 3. create an locate the object on the scene
+    
+    createCone();
+    createFloor(); 
+    createBall();
+    cone.position.y += 0.5;
+    
+    ball.position.x -= 1;
+    ball.position.y += 0.5;
+    ball.position.z += 1.5;
+    
+    
+    // 4. create the renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+
+    document.body.appendChild(renderer.domElement);
+  };
+
+  init(); // main animation loop - calls 50-60 in a second.
+  renderer.render(scene, camera);
+
+</script>
